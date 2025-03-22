@@ -21,11 +21,36 @@ public class Atom : MonoBehaviour
     {
         for (int i = 0; i < electronsSockets.Length; i++)
         {
-            if (electronsSockets[i].IsInsideOrbit(transform.position, pos)) 
+            if (electronsSockets[i].socket.childCount == 0 && electronsSockets[i].IsInsideOrbit(transform.position, pos)) 
                 return electronsSockets[i];
         }
         return null;
     }
+
+    public void AddElectron(ElectronData e,GameObject g)
+    {
+        g.transform.parent = e.socket;
+    }
+
+    public void AddProton(NeutronData n, GameObject g)
+    {
+        g.transform.parent = n.socket;
+    }
+
+    public NeutronData IsNearNucleas(Vector3 pos)
+    {
+        
+        for (int i = 0; i < neutronsSockets.Length; i++)
+        {
+            float dis = Vector3.Distance(pos, neutronsSockets[i].socket.position);
+
+            if (dis < 0.2f && neutronsSockets[i].socket.childCount == 0)
+                return neutronsSockets[i];
+        }
+
+        return null;
+    }
+
 
     [System.Serializable]
     public class NeutronData

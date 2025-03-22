@@ -40,7 +40,7 @@ public class AtomBuilder : MonoBehaviour
         if (selected)
         {
             pos.y = electronInWorld.transform.position.y;
-            selected.transform.position = Vector3.Lerp(selected.transform.position,pos,Time.deltaTime * 5);
+            selected.transform.position = Vector3.Lerp(selected.transform.position,pos,Time.deltaTime * 7);
             return;
         }
 
@@ -69,7 +69,9 @@ public class AtomBuilder : MonoBehaviour
             }
             else
             {
-
+                Atom.NeutronData n = currentAtom.IsNearNucleas(pos);
+                if (n != null)
+                    selected.transform.position = n.socket.position;
             }
         }
     }
@@ -78,6 +80,30 @@ public class AtomBuilder : MonoBehaviour
     void OnClickUp()
     {
         if (selected)
-            Destroy(selected);
+        {
+            if (isElectron)
+            {
+                Atom.ElectronData e = currentAtom.IsInsideAnOrbit(selected.transform.position);
+                if (e != null)
+                {
+                    selected.transform.position = e.socket.position;
+                    currentAtom.AddElectron(e, selected);
+                    selected = null;
+                }
+            }
+            else
+            {
+                Atom.NeutronData n = currentAtom.IsNearNucleas(selected.transform.position);
+                if (n != null)
+                {
+                    selected.transform.position = n.socket.position;
+                    currentAtom.AddProton(n, selected);
+                    selected = null;
+                }
+            }
+
+            if (selected)
+                Destroy(selected);
+        }
     }
 }
