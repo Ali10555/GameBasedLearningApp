@@ -1,9 +1,14 @@
 using UnityEngine;
+using System.Collections;
+using UnityEngine.Events;
 
 public class Atom : MonoBehaviour
 {
+    public int maxProton = 1;
+    public int maxElectron = 1;
     public NeutronData[] neutronsSockets;
     public ElectronData[] electronsSockets;
+    public UnityEvent OnCompletetionEvent;
 
     void Start()
     {
@@ -19,27 +24,51 @@ public class Atom : MonoBehaviour
 
     public ElectronData IsInsideAnOrbit(Vector3 pos)
     {
+        ElectronData nextEmpty = null;
         for (int i = 0; i < electronsSockets.Length; i++)
         {
-            if (electronsSockets[i].socket.childCount == 0 && electronsSockets[i].IsInsideOrbit(transform.position, pos)) 
-                return electronsSockets[i];
+            if (electronsSockets[i].socket.childCount == 0)
+            {
+                nextEmpty = electronsSockets[i];
+                break;
+            }
         }
+
+        if (nextEmpty != null && nextEmpty.IsInsideOrbit(transform.position, pos))
+        {
+            return nextEmpty;
+        }
+
         return null;
+    }
+
+    public int HowManyElectrons()
+    {
+        int total = 0;
+
+        for (int i = 0; i < electronsSockets.Length; i++)
+        {
+            if (electronsSockets[i].socket.childCount > 0)
+                total++;
+        }
+
+        return total;
     }
 
     public void AddElectron(ElectronData e,GameObject g)
     {
         g.transform.parent = e.socket;
+        StartCoroutine(OnComplete());
     }
 
     public void AddProton(NeutronData n, GameObject g)
     {
         g.transform.parent = n.socket;
+        StartCoroutine(OnComplete());
     }
 
     public NeutronData IsNearNucleas(Vector3 pos)
     {
-        
         for (int i = 0; i < neutronsSockets.Length; i++)
         {
             float dis = Vector3.Distance(pos, neutronsSockets[i].socket.position);
@@ -50,6 +79,33 @@ public class Atom : MonoBehaviour
 
         return null;
     }
+
+    public int HowManyProton()
+    {
+        int total = 0;
+
+        for (int i = 0; i < neutronsSockets.Length; i++)
+        {
+            if (neutronsSockets[i].socket.childCount > 0)
+                total++;
+        }
+
+        return total;
+    }
+
+    IEnumerator OnComplete()
+    {
+        if (HowManyElectrons() < maxElectron || HowManyProton() < maxProton)
+            yield break;
+
+        FindAnyObjectByType<TaskUI>().TaskComplete();
+
+        yield return new WaitForSeconds(3);
+
+        OnCompletetionEvent?.Invoke();
+        gameObject.SetActive(false);
+    }
+    
 
 
     [System.Serializable]

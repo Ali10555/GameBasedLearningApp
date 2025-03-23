@@ -6,7 +6,6 @@ public class AtomBuilder : MonoBehaviour
     public GameObject electronPrefab;
     public GameObject protonInWorld;
     public GameObject electronInWorld;
-
     Camera cam;
     bool isElectron;
     GameObject selected;
@@ -22,6 +21,10 @@ public class AtomBuilder : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             currentAtom = FindAnyObjectByType<Atom>();
+
+            if (currentAtom == null)
+                return;
+
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             if(Physics.Raycast(ray,out RaycastHit hit,20))
             {
