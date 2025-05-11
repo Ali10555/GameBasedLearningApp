@@ -1,5 +1,6 @@
 using UnityEngine;
-
+using UnityEngine.Events;
+using System.Collections;
 
 public class MoleculeBuilder : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class MoleculeBuilder : MonoBehaviour
     public Rigidbody[] otherAtoms;
     public LineRenderer lineRendererPrefab;
     Rigidbody currentSelected;
+    public UnityEvent OnCompletetionEvent;
 
     Camera cam;
     void Start()
@@ -127,7 +129,17 @@ public class MoleculeBuilder : MonoBehaviour
 
     void Completed()
     {
-        FindAnyObjectByType<TaskUI>().TaskComplete();
         enabled = false;
+        StartCoroutine(OnComplete());   
+    }
+
+    IEnumerator OnComplete()
+    {
+        FindAnyObjectByType<TaskUI>().TaskComplete();
+
+        yield return new WaitForSeconds(3);
+
+        OnCompletetionEvent?.Invoke();
+        gameObject.SetActive(false);
     }
 }
