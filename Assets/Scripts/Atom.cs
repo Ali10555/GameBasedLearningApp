@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.Events;
+using TMPro;
 
 public class Atom : MonoBehaviour
 {
@@ -9,10 +10,13 @@ public class Atom : MonoBehaviour
     public NeutronData[] neutronsSockets;
     public ElectronData[] electronsSockets;
     public UnityEvent OnCompletetionEvent;
-
+    TextMeshPro nucleasText;
     void Start()
     {
-        
+        nucleasText = GetComponentInChildren<TextMeshPro>();
+
+        if (nucleasText)
+            nucleasText.text = "0";
     }
 
     // Update is called once per frame
@@ -64,6 +68,8 @@ public class Atom : MonoBehaviour
     public void AddProton(NeutronData n, GameObject g)
     {
         g.transform.parent = n.socket;
+        if (nucleasText)
+            nucleasText.text = HowManyProton().ToString();
         StartCoroutine(OnComplete());
     }
 
